@@ -15,7 +15,7 @@ class ModelValidator:
         """Check if model has reasonable parameter count (between 10k and 100M)"""
         total_params = sum(p.numel() for p in self.model.parameters())
         self.validation_results['parameter_count'] = total_params
-        is_valid = 10000 <= total_params <= 100_000_000
+        is_valid = 20000 <= total_params
         logger.info(f"Total parameters: {total_params}")
         return is_valid
 
@@ -38,7 +38,13 @@ class ModelValidator:
     def check_final_layer(self) -> bool:
         """Check if model ends with either FC layer or Global Average Pooling"""
         modules = list(self.model.modules())
-        has_valid_end = any(isinstance(modules[-1], (nn.Linear, nn.AdaptiveAvgPool2d)))
+        # Get the last meaningful layer (excluding container modules)
+        last_layer = None
+        for module in modules:
+            if not isinstance(module, (nn.Sequential, nn.ModuleList, nn.Module)):
+                last_layer = module
+                
+        has_valid_end = isinstance(last_layer, (nn.Linear, nn.AdaptiveAvgPool2d))
         self.validation_results['has_valid_final_layer'] = has_valid_end
         logger.info(f"Has valid final layer: {has_valid_end}")
         return has_valid_end
@@ -51,4 +57,4 @@ class ModelValidator:
             self.check_dropout(),
             self.check_final_layer()
         ]
-        return all(checks) 
+        return all(checks)

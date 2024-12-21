@@ -1,30 +1,46 @@
 import pytest
+from __future__ import print_function
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
 from model_validator import ModelValidator
 
 # Example test model (users will replace this with their own model)
-class SampleNN(nn.Module):
+class Net(nn.Module):
     def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv2d(3, 64, 3)
-        self.bn1 = nn.BatchNorm2d(64)
-        self.conv2 = nn.Conv2d(64, 128, 3)
-        self.bn2 = nn.BatchNorm2d(128)
-        self.dropout = nn.Dropout(0.5)
-        self.fc = nn.Linear(128, 10)
+        super(Net, self).__init__()
+        self.conv = nn.Sequential(
+                nn.Conv2d(1, 8, 3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(8, 8, 3, padding=1),
+                nn.ReLU(),
+                nn.BatchNorm2d(8),
+                nn.Conv2d(8, 8, 3, padding=1),
+                nn.ReLU(),
+                nn.BatchNorm2d(8),
+                nn.MaxPool2d(2,2),
+                nn.Conv2d(8, 16, 3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(16, 16, 3, padding=1),
+                nn.ReLU(),
+                nn.BatchNorm2d(16),
+                nn.MaxPool2d(2,2),
+                nn.Conv2d(16, 20, 3),
+                nn.ReLU(),
+                nn.Conv2d(20, 10, 3),
+                nn.AvgPool2d(3, 2),
+                )
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.conv2(x)
-        x = self.bn2(x)
-        x = self.dropout(x)
-        x = self.fc(x)
+        x = self.conv(x)
+        
+        x = x.view(-1, 10)
+        x = F.log_softmax(x, dim=1)
         return x
 
 def test_model_validation():
-    model = SampleNN()
+    model = Net()
     validator = ModelValidator(model)
     
     assert validator.count_parameters(), "Parameter count check failed"
