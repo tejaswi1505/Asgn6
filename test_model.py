@@ -19,6 +19,7 @@ class Net(nn.Module):
                 nn.ReLU(),
                 nn.BatchNorm2d(8),
                 nn.MaxPool2d(2,2),
+                nn.Dropout(0.25),
                 nn.Conv2d(8, 16, 3, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(16, 16, 3, padding=1),
