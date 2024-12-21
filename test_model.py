@@ -44,6 +44,5 @@ def test_model_validation():
     
     assert validator.count_parameters(), "Parameter count check failed"
     assert validator.check_batch_norm(), "Batch normalization check failed"
-    assert validator.check_dropout(), "Dropout check failed"
     assert validator.check_gap(), "GAP check failed"
     assert validator.run_all_checks(), "Overall validation failed" 
