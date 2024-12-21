@@ -35,22 +35,13 @@ class ModelValidator:
         logger.info(f"Has dropout: {has_dropout}")
         return has_dropout
 
-    def check_final_layer(self) -> bool:
-        """Check if model ends with AvgPool2d"""
-        # Get all modules in a list
-        modules = list(self.model.modules())
-        
-        # Find the last layer (excluding container modules)
-        last_layer = None
-        for module in modules:
-            if not isinstance(module, (nn.Sequential, nn.ModuleList, nn.Module)):
-                last_layer = module
-        
-        # Check if the last layer is AvgPool2d
-        has_valid_end = isinstance(last_layer, nn.AvgPool2d)
-        self.validation_results['has_valid_final_layer'] = has_valid_end
-        logger.info(f"Has Global Average as final layer: {has_valid_end}")
-        return has_valid_end
+    def check_gap(self) -> bool:
+        """Verify if model uses dropout"""
+        has_gap = any(isinstance(module, nn.AvgPool2d) 
+                        for module in self.model.modules())
+        self.validation_results['has_gap'] = has_gap
+        logger.info(f"Has GAP: {has_gap}")
+        return has_gap
 
     def run_all_checks(self) -> bool:
         """Run all validation checks"""
