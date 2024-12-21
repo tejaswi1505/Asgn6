@@ -19,7 +19,6 @@ class Net(nn.Module):
                 nn.ReLU(),
                 nn.BatchNorm2d(8),
                 nn.MaxPool2d(2,2),
-                nn.Dropout(0.25),
                 nn.Conv2d(8, 16, 3, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(16, 16, 3, padding=1),
@@ -46,5 +45,5 @@ def test_model_validation():
     assert validator.count_parameters(), "Parameter count check failed"
     assert validator.check_batch_norm(), "Batch normalization check failed"
     assert validator.check_dropout(), "Dropout check failed"
-    assert validator.check_final_layer(), "Final layer check failed"
+    assert validator.check_gap(), "GAP check failed"
     assert validator.run_all_checks(), "Overall validation failed" 

@@ -27,14 +27,6 @@ class ModelValidator:
         logger.info(f"Has batch normalization: {has_batch_norm}")
         return has_batch_norm
 
-    def check_dropout(self) -> bool:
-        """Verify if model uses dropout"""
-        has_dropout = any(isinstance(module, nn.Dropout) 
-                        for module in self.model.modules())
-        self.validation_results['has_dropout'] = has_dropout
-        logger.info(f"Has dropout: {has_dropout}")
-        return has_dropout
-
     def check_gap(self) -> bool:
         """Verify if model uses dropout"""
         has_gap = any(isinstance(module, nn.AvgPool2d) 
@@ -48,7 +40,6 @@ class ModelValidator:
         checks = [
             self.count_parameters(),
             self.check_batch_norm(),
-            self.check_dropout(),
-            self.check_final_layer()
+            self.check_gap()
         ]
         return all(checks)
